@@ -2,6 +2,7 @@ import psycopg2
 import random
 from datetime import timedelta, datetime
 import string
+from faker import Faker
 
 conn = psycopg2.connect(
     database="postgres",
@@ -9,7 +10,7 @@ conn = psycopg2.connect(
     password="Ut3c0128",
     host="localhost",
     port="5432",
-    options="-c search_path=proyecto_100k"
+    options="-c search_path=proyecto_10k"
     )
 
 cursor = conn.cursor()
@@ -61,6 +62,15 @@ def generar_fecha_hora_aleatoria():
     fecha_hora_aleatoria = fecha_inicio + timedelta(seconds=segundos_aleatorios)
 
     return fecha_hora_aleatoria
+
+# Generar direccion
+def generar_direccion_random():
+    fake = Faker()
+    direccion = fake.address()  # Generar dirección aleatoria
+    # Asegurarse de que la dirección generada no supere los 300 caracteres
+    if len(direccion) > 300:
+        direccion = direccion[:300]  # Truncar la dirección a 300 caracteres
+    return direccion
 
 # Para poblar tablas fijas
 # Generar turnos de los vendedores
@@ -210,6 +220,33 @@ def generate_venta(n):
             cursor.execute(f"SELECT código  FROM Venta WHERE código={codigo}")
             if not cursor.fetchone():
                 cursor.execute(f"INSERT INTO Venta(código, código_cp, fecha_y_hora, total, estado) VALUES ({codigo}, {codigocp}, '{fecha_hora}', {total}, '{estado}')")
+                print("successfully inserted", i)
+                i += 1
+        except Exception as e:
+            print(e, i)
+
+# Generar Venta Virtual
+def generate_ventavirtual(n):
+    i = 0
+    cursor.execute("SELECT código FROM venta;")
+    res1 = cursor.fetchall()
+    cursor.execute("SELECT dni FROM repartidor;")
+    res3 = cursor.fetchall()
+    while i < n:
+        try:
+            codigo = random.choice(res1)[0]
+            direccion= generar_direccion_random()
+            fecha= generar_fecha_hora_aleatoria()
+            costo= random.randint(5, 10)
+            dni= random.choice(res3)[0]
+            # Verificar si el código generado para la venta presencial ya existe en la tabla ventavirtual
+            cursor.execute(f"SELECT código FROM ventavirtual WHERE código={codigo}")
+            venta_virtual_existente = cursor.fetchone()
+
+            # Si el código generado para la venta presencial no existe en la tabla ventavirtual, insertarlo
+            if not venta_virtual_existente:
+                cursor.execute(
+                    f"INSERT INTO VentaVirtual(código, dirección_destino, fecha_y_hora_destino, costo_envío, dni_rep) VALUES ({codigo}, '{direccion}', '{fecha}', {costo}, '{dni}')")
                 print("successfully inserted", i)
                 i += 1
         except Exception as e:
@@ -400,6 +437,3 @@ def generate_pago(n):
 
         except Exception as e:
             print(e, i)
-
-generate_ItemVendido(100000)
-generate_pago(120000)

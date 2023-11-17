@@ -83,7 +83,8 @@ CREATE TABLE VentaVirtual(
     código integer,
     dirección_destino varchar(300),
     fecha_y_hora_destino timestamp,
-    costo_envío smallint
+    costo_envío smallint,
+    dni_rep varchar(8)
 );
 
 CREATE TABLE VentaPresencial(
@@ -181,6 +182,7 @@ ALTER TABLE Venta ADD CONSTRAINT venta_fk FOREIGN KEY (código_cp) REFERENCES Co
 
 ALTER TABLE VentaVirtual ADD CONSTRAINT venta_virtual_pk PRIMARY KEY (código);
 ALTER TABLE VentaVirtual ADD CONSTRAINT venta_virtual_fk FOREIGN KEY (código) REFERENCES Venta(código);
+ALTER TABLE VentaVirtual ADD CONSTRAINT venta_virtual_fk_r FOREIGN KEY (dni_rep) REFERENCES Repartidor(dni);
 
 ALTER TABLE VentaPresencial ADD CONSTRAINT venta_presencial_pk PRIMARY KEY (código);
 ALTER TABLE VentaPresencial ADD CONSTRAINT venta_presencial_fk FOREIGN KEY (código) REFERENCES Venta(código);
