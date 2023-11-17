@@ -1,5 +1,8 @@
+-------- De acuerdo al esquema --------
 SET SCHEMA 'proyecto_1m';
+
 -------- Tablas -------
+
 CREATE TABLE Persona(
     DNI varchar(8),
     nombre_completo varchar(50),
@@ -145,7 +148,8 @@ CREATE TABLE ItemVendido(
     subtotal smallint
 );
 
--------- KEY Constraint -------
+-------- Key Constraints -------
+
 ALTER TABLE Persona ADD CONSTRAINT persona_pk PRIMARY KEY (DNI);
 
 ALTER TABLE Tienda ADD CONSTRAINT tienda_pk PRIMARY KEY (num_stand, centro_comercial);
@@ -216,7 +220,8 @@ ALTER TABLE ItemVendido ADD CONSTRAINT iv_pk PRIMARY KEY (modelo_c, color_c, tal
 ALTER TABLE ItemVendido ADD CONSTRAINT iv_fk_m FOREIGN KEY (modelo_c, color_c, talla_c, precio_c) REFERENCES  Calzado(modelo, color, talla, precio);
 ALTER TABLE ItemVendido ADD CONSTRAINT iv_fk_cv FOREIGN KEY (código_v) REFERENCES  Venta(código);
 
--------- Not Null Constraint -------
+-------- Not Null Constraints -------
+
 ALTER TABLE Persona ALTER COLUMN nombre_completo SET NOT NULL;
 
 ALTER TABLE Vendedor ALTER COLUMN sueldo SET NOT NULL;
@@ -257,7 +262,8 @@ ALTER TABLE Abastecimiento ALTER COLUMN cantidad SET NOT NULL;
 ALTER TABLE ItemVendido ALTER COLUMN cantidad SET NOT NULL;
 ALTER TABLE ItemVendido ALTER COLUMN subtotal SET NOT NULL;
 
--------- Otros Constraint -------
+-------- Otros Constraints -------
+
 ALTER TABLE Repartidor ADD CONSTRAINT calificacion_permitida CHECK (calificación>=3);
 ALTER TABLE Repartidor ADD CONSTRAINT check_tel_r CHECK (teléfono ~ '^9');
 
@@ -281,6 +287,7 @@ ALTER TABLE Abastecimiento ADD CONSTRAINT check_cantidad_a CHECK (cantidad>0);
 ALTER TABLE ItemVendido ADD CONSTRAINT check_cantidad_iv CHECK (cantidad>0);
 
 -------- Triggers -------
+
 CREATE OR REPLACE FUNCTION actualizar_total_venta()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -319,13 +326,9 @@ DECLARE
     total_venta numeric;
     total_pagado numeric;
 BEGIN
-    -- Obtener el total de la venta para la cual se está insertando o actualizando un pago
     SELECT total INTO total_venta FROM Venta WHERE código = NEW.código;
-    -- Obtener la suma total de los pagos para esa venta
     SELECT COALESCE(SUM(monto), 0) INTO total_pagado FROM Pago WHERE código = NEW.código;
-    -- Verificar si la suma de los pagos es igual al total de la venta
     IF total_pagado = total_venta THEN
-        -- Actualizar el estado de la venta a 'pagado'
         UPDATE Venta SET estado = 'pagado' WHERE código = NEW.código;
     END IF;
     RETURN NEW;
