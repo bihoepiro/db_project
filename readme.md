@@ -30,7 +30,7 @@ generate_repartidor(200000)
 generate_odc(n)
 generate_cdp(n)
 generate_venta(n)
-# antes hacer la inserccion de venta virtual en DBeaver.
+generate_ventavirtual(190000)
 generate_ventap(810000)
 generate_abastecimiento(n)
 generate_ventaep(20000)
@@ -42,7 +42,5 @@ generate_pago(1200000)
 
 
 ### Observaciones
-
-
-Las tablas Persona, Empresa y VentaPresencial son las únicas que son creadas en DBeaver.
+Las tablas Persona y Empresa son las únicas que son creadas en DBeaver.
 
