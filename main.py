@@ -91,14 +91,11 @@ def generate_turno(n):
             dia = random.choice(days_of_week)
             if not check_existing_turno(dni, dia):
                 hora_inicio = timedelta(hours=random.randint(9, 12), minutes=random.randint(0, 59))
-
                 # Definir el límite de tiempo para que no exceda las 20:00
                 max_time = timedelta(hours=20, minutes=0)
                 remaining_time = max_time - hora_inicio
-
                 # Asegurar que el número de horas generadas no exceda el tiempo restante
                 num_horas = min(remaining_time.seconds // 3600, 11)
-
                 cursor.execute(
                     f"INSERT INTO Turno(DNI, día, hora_inicio, num_horas) VALUES ('{dni}', '{dia}', '{hora_inicio}', {num_horas});")
                 print("Successfully inserted", i)
@@ -239,11 +236,8 @@ def generate_ventavirtual(n):
             fecha= generar_fecha_hora_aleatoria()
             costo= random.randint(5, 10)
             dni= random.choice(res3)[0]
-            # Verificar si el código generado para la venta presencial ya existe en la tabla ventavirtual
             cursor.execute(f"SELECT código FROM ventavirtual WHERE código={codigo}")
             venta_virtual_existente = cursor.fetchone()
-
-            # Si el código generado para la venta presencial no existe en la tabla ventavirtual, insertarlo
             if not venta_virtual_existente:
                 cursor.execute(
                     f"INSERT INTO VentaVirtual(código, dirección_destino, fecha_y_hora_destino, costo_envío, dni_rep) VALUES ({codigo}, '{direccion}', '{fecha}', {costo}, '{dni}')")
@@ -312,12 +306,8 @@ def generate_ventaep(n):
             ruc = random.choice(res2)[0]
             cursor.execute(f"SELECT código_v FROM ventaep WHERE código_v={codigo}")
             venta_epresencial_existente = cursor.fetchone()
-
-            # Verificar si el código generado para la venta presencial ya existe en la tabla ventavirtual
             cursor.execute(f"SELECT código_v FROM ventap WHERE código_v={codigo}")
             venta_p_existente = cursor.fetchone()
-
-            # Si el código generado para la venta presencial no existe en la tabla ventavirtual, insertarlo
             if not venta_epresencial_existente and not venta_p_existente:
                 cursor.execute(
                     f"INSERT INTO VentaEP(código_v,  ruc) VALUES ({codigo}, '{ruc}')")
@@ -339,12 +329,8 @@ def generate_ventapr(n):
             dni = random.choice(res2)[0]
             cursor.execute(f"SELECT código_v FROM ventaep WHERE código_v={codigo}")
             venta_epresencial_existente = cursor.fetchone()
-
-            # Verificar si el código generado para la venta presencial ya existe en la tabla ventavirtual
             cursor.execute(f"SELECT código_v FROM ventap WHERE código_v={codigo}")
             venta_p_existente = cursor.fetchone()
-
-            # Si el código generado para la venta presencial no existe en la tabla ventavirtual, insertarlo
             if not venta_epresencial_existente and not venta_p_existente:
                 cursor.execute(
                     f"INSERT INTO VentaP(código_v,  dni) VALUES ({codigo}, '{dni}')")
@@ -415,8 +401,6 @@ def generate_pago(n):
 
             cursor.execute(f"SELECT SUM(monto) FROM Pago WHERE código={codigo_venta};")
             total_pagado = cursor.fetchone()[0] or 0  # Si no hay registros en la suma, se toma como 0
-
-            # Si el total pagado es menor que el total de la venta, se agrega un nuevo pago
             if total_pagado < total_venta:
                 metodo = random.choice(metodo_pago)
                 dni = random.choice(res2)[0]
@@ -426,12 +410,8 @@ def generate_pago(n):
                     f"INSERT INTO Pago(código, método_pago, dni, monto) VALUES ({codigo_venta}, '{metodo}', '{dni}', {monto})")
                 print("Successfully inserted payment for sale:", codigo_venta)
                 i += 1
-
-            # Si el total pagado es igual al total de la venta, se pasa a la siguiente venta
             else:
                 continue
-
-            # Si se han generado pagos para todas las ventas, salir del bucle
             if i == n:
                 break
 
