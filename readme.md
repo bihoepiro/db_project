@@ -26,18 +26,18 @@ generate_stock(2600)
 
 # tablas dinámicas
 generate_cliente(n)
-generate_repartidor(2000)
+generate_repartidor(200000)
 generate_odc(n)
 generate_cdp(n)
 generate_venta(n)
 # antes hacer la inserccion de venta virtual en DBeaver.
-generate_ventap(8100)
+generate_ventap(810000)
 generate_abastecimiento(n)
-generate_ventaep(200)
-generate_ventapr(7900)
-generate_ventav(1900)
+generate_ventaep(20000)
+generate_ventapr(790000)
+generate_ventav(190000)
 generate_ItemVendido(n)
-generate_pago(12000)
+generate_pago(1200000)
 ```
 
 
