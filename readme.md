@@ -11,7 +11,7 @@ En este archivo están las querys para crear las tablas, keys, constraints y tri
 En este archivo está el código en Python para generar data que contiene +1 llave fóranea y no se pudo generar con DBeaver.
 
 
-##### Código por añadir
+##### - Código por añadir
 
 
 En el archivo main.py se debe llamar a las funciones para generar la data. Este es el orden en el que se deben de llamar a estas.
