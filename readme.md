@@ -4,11 +4,15 @@
 
 En este archivo están las querys para crear las tablas, keys, constraints y triggers. A la vez, los datos de las tablas fijas.
 
+
 #### main.py
+
 
 En este archivo está el código en Python para generar data que contiene +1 llave fóranea y no se pudo generar con DBeaver.
 
+
 ##### Código por añadir
+
 
 En el archivo main.py se debe llamar a las funciones para generar la data. Este es el orden en el que se deben de llamar a estas.
 
@@ -36,7 +40,9 @@ generate_ItemVendido(n)
 generate_pago(12000)
 ```
 
+
 ### Observaciones
+
 
 Las tablas Persona, Empresa y VentaPresencial son las únicas que son creadas en DBeaver.
 
