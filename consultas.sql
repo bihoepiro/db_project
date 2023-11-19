@@ -1,5 +1,5 @@
--- Consulta 1
--- Cuales fueron los 5 tipos de Botas más y menos vendidas en Invierno 2023 y 2022
+-- Consulta 1 --
+-- Cuales fueron los 5 tipos de Botas más y menos vendidas en Invierno 2023 y 2022.
 WITH TopProductosMasVendidos AS (
     -- Subconsulta que encuentra los productos más vendidos
     SELECT IV.modelo_c, IV.color_c, SUM(IV.cantidad) AS total_vendido
@@ -30,8 +30,8 @@ LEFT JOIN (
     GROUP BY IV.modelo_c, IV.color_c
 ) VV ON TP.modelo_c = VV.modelo_c AND TP.color_c = VV.color_c;
 
--- Consulta 2
--- A que empresas pertenecen los repartidores que hicieron más envíos
+-- Consulta 2 --
+-- A que empresas pertenecen los repartidores que hicieron más envíos.
 SELECT E.nombre AS nombre_empresa
 FROM (
     SELECT R.ruc, COUNT(*) AS veces_repartiendo
@@ -50,8 +50,8 @@ WHERE repartidores_max.veces_repartiendo IN (
     ) max_veces_repartiendo
 );
 
--- Consulta 3
--- Tienda tiene más pagos en MasterCard, Visa, Yape y Plin,
+-- Consulta 3 --
+-- Tienda tiene más pagos en MasterCard, Visa, Yape y Plin.
 WITH PagosPorMetodo AS (
     SELECT
         P.método_pago,
@@ -79,10 +79,9 @@ SELECT
 FROM PagosPorMetodo P
 JOIN MaxPagosPorMetodo M ON P.método_pago = M.método_pago AND P.total_pagos = M.max_pagos;
 
--- Consulta 4
+-- Consulta 4 --
 -- Los calzados más abastecidos en cada tienda y cuantos han sido vendidos de estos en dicha tienda.
 WITH CalzadoAbastecido AS (
-    -- Consulta para obtener el calzado más abastecido en cada tienda
     SELECT
         S.num_stand_T AS num_stand,
         S.centro_comercial_T AS centro_comercial,
@@ -95,7 +94,6 @@ WITH CalzadoAbastecido AS (
     GROUP BY S.num_stand_T, S.centro_comercial_t, A.modelo_c, A.color_c, A.talla_c
 ),
 MaxStockPorTienda AS (
-    -- Consulta para obtener el máximo stock por tienda
     SELECT
         num_stand,
         centro_comercial,
@@ -104,7 +102,6 @@ MaxStockPorTienda AS (
     GROUP BY num_stand, centro_comercial
 ),
 CalzadoMaxAbastecido AS (
-    -- Consulta para obtener el calzado con el stock máximo por tienda
     SELECT
         CA.num_stand AS num_stand,
         CA.centro_comercial AS centro_comercial,
@@ -115,7 +112,6 @@ CalzadoMaxAbastecido AS (
     FROM CalzadoAbastecido CA
     JOIN MaxStockPorTienda M ON CA.num_stand = M.num_stand AND CA.centro_comercial = M.centro_comercial AND CA.total_stock = M.max_stock
 )
--- Consulta para obtener la cantidad vendida de cada uno de los calzados más abastecidos en cada tienda
 SELECT
     CMA.num_stand,
     CMA.centro_comercial,
