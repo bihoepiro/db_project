@@ -39,7 +39,9 @@ generate_ventav(190000)
 generate_ItemVendido(n)
 generate_pago(1200000)
 ```
+#### consultas.sql
 
+Las consultas que se ejecutarán en los 4 esquemas.
 
 ### Observaciones
 Las tablas Persona y Empresa son las únicas que son creadas en DBeaver.
