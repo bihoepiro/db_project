@@ -2,7 +2,7 @@
 
 #### console.sql
 
-En este archivo están las querys para crear las tablas, keys, constraints y triggers. A la vez, los datos de las tablas fijas.
+En este archivo está el código para crear las tablas, keys, constraints y triggers. A la vez, los datos de las tablas fijas.
 
 
 #### main.py
