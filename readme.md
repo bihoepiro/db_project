@@ -2,7 +2,7 @@
 
 #### console.sql
 
-En este archivo están las querys para crear las tablas, keys, constraints y triggers. A la vez, los datos de las tablas fijas.
+En este archivo está el código para crear las tablas, keys, constraints y triggers. A la vez, los datos de las tablas fijas.
 
 
 #### main.py
@@ -39,7 +39,9 @@ generate_ventav(190000)
 generate_ItemVendido(n)
 generate_pago(1200000)
 ```
+#### consultas.sql
 
+Las consultas que se ejecutarán en los 4 esquemas.
 
 ### Observaciones
 Las tablas Persona y Empresa son las únicas que son creadas en DBeaver.
