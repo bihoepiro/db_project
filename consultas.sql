@@ -15,7 +15,10 @@ WITH TopProductosMasVendidos AS (
 SELECT TP.modelo_c,
        TP.color_c,
        TP.total_vendido,
-       COALESCE(VP.modalidad, VV.modalidad, 'Sin información') AS modalidad_mas_vendida
+       CASE
+           WHEN COALESCE(VP.total_presencial, 0) > COALESCE(VV.total_virtual, 0) THEN 'Presencial'
+           ELSE 'Virtual'
+       END AS modalidad_mcomun
 FROM TopProductosMasVendidos TP
 LEFT JOIN (
     SELECT IV.modelo_c, IV.color_c, 'Presencial' AS modalidad, SUM(IV.cantidad) AS total_presencial
