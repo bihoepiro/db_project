@@ -1,5 +1,5 @@
 -- Consulta 1 --
--- Cuales fueron los 5 tipos de Botas más y menos vendidas en Invierno 2023 y 2022.
+-- Cuales fueron los 5 tipos de Botas más vendidas en Invierno 2023 y 2022.
 WITH TopProductosMasVendidos AS (
     -- Subconsulta que encuentra los productos más vendidos
     SELECT IV.modelo_c, IV.color_c, SUM(IV.cantidad) AS total_vendido
@@ -15,7 +15,10 @@ WITH TopProductosMasVendidos AS (
 SELECT TP.modelo_c,
        TP.color_c,
        TP.total_vendido,
-       COALESCE(VP.modalidad, VV.modalidad, 'Sin información') AS modalidad_mas_vendida
+       CASE
+           WHEN COALESCE(VP.total_presencial, 0) > COALESCE(VV.total_virtual, 0) THEN 'Presencial'
+           ELSE 'Virtual'
+       END AS modalidad_mcomun
 FROM TopProductosMasVendidos TP
 LEFT JOIN (
     SELECT IV.modelo_c, IV.color_c, 'Presencial' AS modalidad, SUM(IV.cantidad) AS total_presencial
