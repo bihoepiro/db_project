@@ -1,10 +1,5 @@
-<<<<<<< HEAD
--- Consulta 1
--- Cuales fueron los 5 tipos de Botas más vendidas en Invierno 2023 y 2022
-=======
 -- Consulta 1 --
 -- Cuales fueron los 5 tipos de Botas más y menos vendidas en Invierno 2023 y 2022.
->>>>>>> 679d89bf35b520dc2bd177a651573dd78e2b33f3
 WITH TopProductosMasVendidos AS (
     -- Subconsulta que encuentra los productos más vendidos
     SELECT IV.modelo_c, IV.color_c, SUM(IV.cantidad) AS total_vendido
@@ -58,7 +53,6 @@ WHERE repartidores_max.veces_repartiendo IN (
     ) max_veces_repartiendo
 );
 
-<<<<<<< HEAD
 -- Consulta 3
 -- Tienda tiene más pagos en MasterCard, Visa, Yape y Plin,
 SELECT
@@ -67,11 +61,6 @@ SELECT
     P.método_pago,
     P.total_pagos
 FROM (
-=======
--- Consulta 3 --
--- Tienda tiene más pagos en MasterCard, Visa, Yape y Plin.
-WITH PagosPorMetodo AS (
->>>>>>> 679d89bf35b520dc2bd177a651573dd78e2b33f3
     SELECT
         P.método_pago,
         C.num_stand,
@@ -103,40 +92,6 @@ JOIN (
 
 -- Consulta 4 --
 -- Los calzados más abastecidos en cada tienda y cuantos han sido vendidos de estos en dicha tienda.
-<<<<<<< HEAD
-=======
-WITH CalzadoAbastecido AS (
-    SELECT
-        S.num_stand_T AS num_stand,
-        S.centro_comercial_T AS centro_comercial,
-        A.modelo_c AS modelo,
-        A.color_c AS color,
-        A.talla_c AS talla,
-        SUM(S.cantidad) AS total_stock
-    FROM Stock S
-    JOIN Abastecimiento A ON S.modelo_c = A.modelo_c AND S.color_c = A.color_c AND S.talla_c = A.talla_c
-    GROUP BY S.num_stand_T, S.centro_comercial_t, A.modelo_c, A.color_c, A.talla_c
-),
-MaxStockPorTienda AS (
-    SELECT
-        num_stand,
-        centro_comercial,
-        MAX(total_stock) AS max_stock
-    FROM CalzadoAbastecido
-    GROUP BY num_stand, centro_comercial
-),
-CalzadoMaxAbastecido AS (
-    SELECT
-        CA.num_stand AS num_stand,
-        CA.centro_comercial AS centro_comercial,
-        CA.modelo AS modelo,
-        CA.color AS color,
-        CA.talla AS talla,
-        CA.total_stock AS stock
-    FROM CalzadoAbastecido CA
-    JOIN MaxStockPorTienda M ON CA.num_stand = M.num_stand AND CA.centro_comercial = M.centro_comercial AND CA.total_stock = M.max_stock
-)
->>>>>>> 679d89bf35b520dc2bd177a651573dd78e2b33f3
 SELECT
     CMA.num_stand,
     CMA.centro_comercial,
