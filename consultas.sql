@@ -1,5 +1,5 @@
 -- Consulta 1
--- Cuales fueron los 5 tipos de Botas más y menos vendidas en Invierno 2023 y 2022
+-- Cuales fueron los 5 tipos de Botas más vendidas en Invierno 2023 y 2022
 WITH TopProductosMasVendidos AS (
     -- Subconsulta que encuentra los productos más vendidos
     SELECT IV.modelo_c, IV.color_c, SUM(IV.cantidad) AS total_vendido
@@ -15,7 +15,10 @@ WITH TopProductosMasVendidos AS (
 SELECT TP.modelo_c,
        TP.color_c,
        TP.total_vendido,
-       COALESCE(VP.modalidad, VV.modalidad, 'Sin información') AS modalidad_mas_vendida
+       CASE
+           WHEN COALESCE(VP.total_presencial, 0) > COALESCE(VV.total_virtual, 0) THEN 'Presencial'
+           ELSE 'Virtual'
+       END AS modalidad_mcomun
 FROM TopProductosMasVendidos TP
 LEFT JOIN (
     SELECT IV.modelo_c, IV.color_c, 'Presencial' AS modalidad, SUM(IV.cantidad) AS total_presencial
@@ -52,7 +55,12 @@ WHERE repartidores_max.veces_repartiendo IN (
 
 -- Consulta 3
 -- Tienda tiene más pagos en MasterCard, Visa, Yape y Plin,
-WITH PagosPorMetodo AS (
+SELECT
+    P.num_stand,
+    P.centro_comercial,
+    P.método_pago,
+    P.total_pagos
+FROM (
     SELECT
         P.método_pago,
         C.num_stand,
@@ -62,60 +70,28 @@ WITH PagosPorMetodo AS (
     JOIN VentaPresencial VP ON P.código = VP.código
     JOIN Caja C ON VP.caja_número = C.número AND VP.num_stand = C.num_stand AND VP.centro_comercial = C.centro_comercial
     GROUP BY P.método_pago, C.num_stand, C.centro_comercial
-),
-MaxPagosPorMetodo AS (
+) P
+JOIN (
     SELECT
         método_pago,
         MAX(total_pagos) AS max_pagos
-    FROM PagosPorMetodo
+    FROM (
+        SELECT
+            P.método_pago,
+            C.num_stand,
+            C.centro_comercial,
+            COUNT(*) AS total_pagos
+        FROM Pago P
+        JOIN VentaPresencial VP ON P.código = VP.código
+        JOIN Caja C ON VP.caja_número = C.número AND VP.num_stand = C.num_stand AND VP.centro_comercial = C.centro_comercial
+        GROUP BY P.método_pago, C.num_stand, C.centro_comercial
+    ) AS PagosPorMetodo
     WHERE método_pago IN ('MasterCard', 'Visa', 'Yape', 'Plin')
     GROUP BY método_pago
-)
-SELECT
-    P.num_stand,
-    P.centro_comercial,
-    P.método_pago,
-    P.total_pagos
-FROM PagosPorMetodo P
-JOIN MaxPagosPorMetodo M ON P.método_pago = M.método_pago AND P.total_pagos = M.max_pagos;
+) M ON P.método_pago = M.método_pago AND P.total_pagos = M.max_pagos;
 
 -- Consulta 4
 -- Los calzados más abastecidos en cada tienda y cuantos han sido vendidos de estos en dicha tienda.
-WITH CalzadoAbastecido AS (
-    -- Consulta para obtener el calzado más abastecido en cada tienda
-    SELECT
-        S.num_stand_T AS num_stand,
-        S.centro_comercial_T AS centro_comercial,
-        A.modelo_c AS modelo,
-        A.color_c AS color,
-        A.talla_c AS talla,
-        SUM(S.cantidad) AS total_stock
-    FROM Stock S
-    JOIN Abastecimiento A ON S.modelo_c = A.modelo_c AND S.color_c = A.color_c AND S.talla_c = A.talla_c
-    GROUP BY S.num_stand_T, S.centro_comercial_t, A.modelo_c, A.color_c, A.talla_c
-),
-MaxStockPorTienda AS (
-    -- Consulta para obtener el máximo stock por tienda
-    SELECT
-        num_stand,
-        centro_comercial,
-        MAX(total_stock) AS max_stock
-    FROM CalzadoAbastecido
-    GROUP BY num_stand, centro_comercial
-),
-CalzadoMaxAbastecido AS (
-    -- Consulta para obtener el calzado con el stock máximo por tienda
-    SELECT
-        CA.num_stand AS num_stand,
-        CA.centro_comercial AS centro_comercial,
-        CA.modelo AS modelo,
-        CA.color AS color,
-        CA.talla AS talla,
-        CA.total_stock AS stock
-    FROM CalzadoAbastecido CA
-    JOIN MaxStockPorTienda M ON CA.num_stand = M.num_stand AND CA.centro_comercial = M.centro_comercial AND CA.total_stock = M.max_stock
-)
--- Consulta para obtener la cantidad vendida de cada uno de los calzados más abastecidos en cada tienda
 SELECT
     CMA.num_stand,
     CMA.centro_comercial,
@@ -124,6 +100,45 @@ SELECT
     CMA.talla,
     CMA.stock AS stock_abastecido,
     COALESCE(SUM(IV.cantidad), 0) AS cantidad_vendida
-FROM CalzadoMaxAbastecido CMA
+FROM (
+    SELECT
+        CA.num_stand AS num_stand,
+        CA.centro_comercial AS centro_comercial,
+        CA.modelo AS modelo,
+        CA.color AS color,
+        CA.talla AS talla,
+        CA.total_stock AS stock
+    FROM (
+        SELECT
+            S.num_stand_T AS num_stand,
+            S.centro_comercial_T AS centro_comercial,
+            A.modelo_c AS modelo,
+            A.color_c AS color,
+            A.talla_c AS talla,
+            SUM(S.cantidad) AS total_stock
+        FROM Stock S
+        JOIN Abastecimiento A ON S.modelo_c = A.modelo_c AND S.color_c = A.color_c AND S.talla_c = A.talla_c
+        GROUP BY S.num_stand_T, S.centro_comercial_t, A.modelo_c, A.color_c, A.talla_c
+    ) CA
+    JOIN (
+        SELECT
+            num_stand,
+            centro_comercial,
+            MAX(total_stock) AS max_stock
+        FROM (
+            SELECT
+                S.num_stand_T AS num_stand,
+                S.centro_comercial_T AS centro_comercial,
+                A.modelo_c AS modelo,
+                A.color_c AS color,
+                A.talla_c AS talla,
+                SUM(S.cantidad) AS total_stock
+            FROM Stock S
+            JOIN Abastecimiento A ON S.modelo_c = A.modelo_c AND S.color_c = A.color_c AND S.talla_c = A.talla_c
+            GROUP BY S.num_stand_T, S.centro_comercial_t, A.modelo_c, A.color_c, A.talla_c
+        ) CalzadoAbastecido
+        GROUP BY num_stand, centro_comercial
+    ) M ON CA.num_stand = M.num_stand AND CA.centro_comercial = M.centro_comercial AND CA.total_stock = M.max_stock
+) CMA
 LEFT JOIN ItemVendido IV ON CMA.modelo = IV.modelo_c AND CMA.color = IV.color_c AND CMA.talla = IV.talla_c
 GROUP BY CMA.num_stand, CMA.centro_comercial, CMA.modelo, CMA.color, CMA.talla, CMA.stock;
